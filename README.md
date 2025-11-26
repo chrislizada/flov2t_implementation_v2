@@ -1,0 +1,145 @@
+# FLoV2T Implementation
+
+Federated Learning with LoRA and Vision Transformer for Fine-grained Malicious Traffic Classification
+
+## Paper Reference
+**FLoV2T: A fine-grained malicious traffic classification method based on federated learning for AIoT**  
+Authors: Fanyi Zeng, Chen Xu, Dapeng Man, Junhui Jiang, Wu Yang  
+Published in: Computer Communications 242 (2025) 108288
+
+## Project Structure
+
+```
+flov2t/
+├── README.md                 # This file
+├── requirements.txt          # Python dependencies
+├── config/
+│   ├── __init__.py
+│   ├── config.yaml          # Configuration file
+│   └── model_config.py      # Model hyperparameters
+├── data/
+│   ├── __init__.py
+│   ├── packet2patch.py      # Packet to patch transformation
+│   ├── dataset.py           # Dataset handling
+│   └── data_loader.py       # Federated data splitting
+├── models/
+│   ├── __init__.py
+│   ├── lora.py              # LoRA implementation
+│   ├── rtfe.py              # Raw Traffic Feature Extraction
+│   └── vit_model.py         # ViT with LoRA
+├── federated/
+│   ├── __init__.py
+│   ├── client.py            # FL Client
+│   ├── server.py            # FL Server with RGPA
+│   └── aggregation.py       # RGPA implementation
+├── utils/
+│   ├── __init__.py
+│   ├── metrics.py           # Evaluation metrics
+│   ├── logger.py            # Logging utilities
+│   └── visualization.py     # Result visualization
+├── train.py                 # Main training script
+├── evaluate.py              # Evaluation script
+└── preprocess_cicids.py     # CICIDS2017 preprocessing
+```
+
+## Installation
+
+```bash
+cd /mnt/c/Users/christopherli/OneDrive - TrendMicro/Apey/Masteral/Papers/EdgeFedIDS/benchmark_suite/implementation/flov2t
+pip install -r requirements.txt
+```
+
+## Dataset Preparation
+
+Place CICIDS2017 PCAP files in the `datasets/` directory:
+
+```
+datasets/
+├── CICIDS2017/
+│   ├── raw/
+│   │   ├── Friday-WorkingHours.pcap
+│   │   ├── Monday-WorkingHours.pcap
+│   │   └── ...
+│   └── processed/
+│       ├── train/
+│       └── test/
+```
+
+## Preprocessing
+
+```bash
+python preprocess_cicids.py --input datasets/CICIDS2017/raw --output datasets/CICIDS2017/processed
+```
+
+## Training
+
+### IID Setting (3 clients)
+```bash
+python train.py --config config/config.yaml --num_clients 3 --distribution iid --rounds 18
+```
+
+### Non-IID Setting (5 clients)
+```bash
+python train.py --config config/config.yaml --num_clients 5 --distribution non_iid --rounds 18
+```
+
+## Evaluation
+
+```bash
+python evaluate.py --model_path checkpoints/flov2t_final.pth --test_data datasets/CICIDS2017/processed/test
+```
+
+## Key Components
+
+### 1. Packet2Patch Transformation
+- Converts raw PCAP traffic to 224×224 images
+- Each packet becomes a 16×16 patch (20B net header + 20B trans header + 216B payload)
+- Up to 196 packets per flow (14×14 grid)
+
+### 2. LoRA Fine-tuning
+- Rank: 4, Alpha: 8
+- Reduces parameters from 21.67M to 336.8K (98.44% reduction)
+- Applied to all attention and FFN layers
+
+### 3. RGPA Aggregation
+- Regularization coefficient λ = 0.1
+- Client weights proportional to data samples
+- Mitigates non-IID data bias
+
+## Expected Performance
+
+| Dataset | Setting | Clients | Accuracy | F1-Score |
+|---------|---------|---------|----------|----------|
+| CICIDS2017 | IID | 3 | 97.19% | 96.93% |
+| CICIDS2017 | IID | 5 | 97.92% | 97.47% |
+| CICIDS2017 | Non-IID | 3 | 94.81% | 94.66% |
+| CICIDS2017 | Non-IID | 5 | 94.53% | 93.74% |
+
+## Attack Categories (8 classes)
+
+1. Botnet
+2. DoS-Slowloris
+3. DoS-Goldeneye
+4. DoS-Hulk
+5. SSH-BruteForce
+6. Web-SQL
+7. Web-XSS
+8. Web-Bruteforce
+
+## Citation
+
+```bibtex
+@article{zeng2025flov2t,
+  title={FLoV2T: A fine-grained malicious traffic classification method based on federated learning for AIoT},
+  author={Zeng, Fanyi and Xu, Chen and Man, Dapeng and Jiang, Junhui and Yang, Wu},
+  journal={Computer Communications},
+  volume={242},
+  pages={108288},
+  year={2025},
+  publisher={Elsevier}
+}
+```
+
+## License
+
+This is an independent implementation for research and educational purposes.

@@ -1,0 +1,123 @@
+# FLoV2T Configuration File
+
+# Dataset configuration
+dataset:
+  name: "CICIDS2017"
+  root_dir: "../../datasets/CICIDS2017"
+  num_classes: 8
+  attack_categories:
+    - "Botnet"
+    - "DoS-Slowloris"
+    - "DoS-Goldeneye"
+    - "DoS-Hulk"
+    - "SSH-BruteForce"
+    - "Web-SQL"
+    - "Web-XSS"
+    - "Web-Bruteforce"
+  train_test_split: 0.8
+  
+# Packet2Patch transformation
+preprocessing:
+  max_packets_per_flow: 196
+  patch_size: 16
+  image_size: 224
+  net_header_bytes: 20
+  trans_header_bytes: 20
+  payload_bytes: 216
+  channels: 3
+
+# Model configuration
+model:
+  backbone: "WinKawaks/vit-tiny-patch16-224"
+  num_classes: 8
+  pretrained: true
+  
+# LoRA configuration
+lora:
+  rank: 4
+  alpha: 8
+  dropout: 0.0
+  target_modules:
+    - "query"
+    - "key"
+    - "value"
+    - "dense"
+    - "intermediate"
+
+# Federated learning configuration
+federated:
+  num_clients: 3
+  num_rounds: 18
+  client_selection: "all"  # or "random"
+  
+  # Data distribution
+  distribution: "non_iid"  # or "iid"
+  non_iid_config:
+    # For 3 clients (non-IID)
+    3:
+      client_0: ["Botnet", "DoS-Slowloris", "Web-SQL"]
+      client_1: ["DoS-Goldeneye", "SSH-BruteForce"]
+      client_2: ["Web-XSS", "DoS-Hulk", "Web-Bruteforce"]
+    # For 5 clients (non-IID)
+    5:
+      client_0: ["Botnet", "Web-Bruteforce"]
+      client_1: ["DoS-Goldeneye", "DoS-Hulk"]
+      client_2: ["Web-SQL", "Web-XSS"]
+      client_3: ["DoS-Slowloris"]
+      client_4: ["SSH-BruteForce"]
+  
+  # RGPA parameters
+  aggregation:
+    method: "rgpa"  # Regularized Global Parameter Aggregation
+    lambda_reg: 0.1
+    weight_by_samples: true
+
+# Training configuration
+training:
+  local_epochs: 1
+  batch_size: 32
+  learning_rate: 1e-4
+  weight_decay: 0.01
+  optimizer: "adamw"
+  scheduler: "cosine"
+  warmup_epochs: 3
+  
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 5
+    min_delta: 0.001
+
+# Evaluation configuration
+evaluation:
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1_score"
+  confusion_matrix: true
+  per_class_metrics: true
+
+# Hardware configuration
+hardware:
+  device: "cuda"  # or "cpu"
+  num_workers: 4
+  pin_memory: true
+  mixed_precision: false
+
+# Logging and checkpointing
+logging:
+  log_dir: "./logs"
+  tensorboard: true
+  wandb:
+    enabled: false
+    project: "flov2t"
+    entity: null
+  
+  checkpoint_dir: "./checkpoints"
+  save_every_n_rounds: 5
+  save_best_only: true
+
+# Reproducibility
+seed: 42
+deterministic: true
