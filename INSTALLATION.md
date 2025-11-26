@@ -48,8 +48,10 @@ python -c "from scapy.all import rdpcap; print('Scapy OK')"
 ### Option A: Manual Download
 
 1. Visit: https://www.unb.ca/cic/datasets/ids-2017.html
-2. Download PCAP files
-3. Place in: `../../datasets/CICIDS2017/raw/`
+2. Download PCAP files AND CSV label files
+3. Place in:
+   - PCAPs: `../../datasets/CICIDS2017/raw/`
+   - CSV labels: `../../datasets/CICIDS2017/csv/`
 
 ### Option B: Use Existing Dataset
 
@@ -78,8 +80,12 @@ EdgeFedIDS/
 └── datasets/
     └── CICIDS2017/
         ├── raw/              # Original PCAP files
-        │   ├── Friday-WorkingHours-Afternoon-DDos.pcap
-        │   ├── Friday-WorkingHours-Afternoon-PortScan.pcap
+        │   ├── Friday-WorkingHours.pcap
+        │   ├── Monday-WorkingHours.pcap
+        │   └── ...
+        ├── csv/              # CSV label files
+        │   ├── Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv
+        │   ├── Monday-WorkingHours.pcap_ISCX.csv
         │   └── ...
         └── processed/         # Processed images (created by preprocessing)
             ├── train/
@@ -92,12 +98,14 @@ EdgeFedIDS/
 ## Step 6: Preprocess Data
 
 ```bash
-# This will take several hours depending on dataset size
+# CSV-guided preprocessing extracts only 8 attack categories (~9K flows)
 python preprocess_cicids.py \
-    --input ../../datasets/CICIDS2017/raw \
-    --output ../../datasets/CICIDS2017/processed \
-    --attack-types Botnet DoS-Slowloris DoS-Goldeneye DoS-Hulk SSH-BruteForce Web-SQL Web-XSS Web-Bruteforce
+    --pcap-dir ../../datasets/CICIDS2017/raw \
+    --csv-dir ../../datasets/CICIDS2017/csv \
+    --output ../../datasets/CICIDS2017/processed
 ```
+
+**Note:** This uses CSV labels to extract specific attack flows, not the entire dataset. Expects ~9K total flows (per paper Table 1).
 
 ## Step 7: Test Components
 

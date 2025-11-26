@@ -86,11 +86,12 @@ Create `train.py`:
 
 ### Priority 2: Data Preparation
 
-Create `preprocess_cicids.py`:
+`preprocess_cicids.py` extracts specific attack flows using CSV labels:
 ```python
-# Read CICIDS2017 PCAPs
-# Use Packet2PatchTransformer
-# Save processed images
+# Map CSV labels to attack types (Bot → Botnet, SSH-Patator → SSH-BruteForce)
+# Extract flows by matching Source IP + Destination IP
+# Convert to images using Packet2PatchTransformer
+# Save ~9K flows total (per paper Table 1)
 ```
 
 ### Priority 3: Evaluation
@@ -115,8 +116,11 @@ python -m federated.aggregation
 
 ### Step 2: Integration Test (After completing scripts)
 ```bash
-# Test with tiny dataset (10 samples)
-python preprocess_cicids.py --input test_data/ --output test_processed/
+# Test with a single CSV-PCAP pair
+python preprocess_cicids.py \
+    --pcap-dir test_data/raw/ \
+    --csv-dir test_data/csv/ \
+    --output test_processed/
 python train.py --config config/config.yaml --num_clients 2 --rounds 1
 ```
 

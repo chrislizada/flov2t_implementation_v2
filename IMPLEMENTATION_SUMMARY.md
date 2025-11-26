@@ -152,9 +152,10 @@ flov2t/
    - Confusion matrix
 
 5. **preprocess_cicids.py** - Preprocessing
-   - PCAP file processing
-   - Label extraction
-   - Train/test splitting
+   - CSV-guided flow extraction
+   - Attack label mapping (CSV → FLoV2T categories)
+   - PCAP flow extraction by IP matching
+   - Train/test splitting (~9K flows total)
 
 6. **utils/** - Utilities
    - Metrics (accuracy, precision, recall, F1)
@@ -237,8 +238,13 @@ pip install -r requirements.txt
 
 ### 2. Prepare Data
 ```bash
-# Place CICIDS2017 PCAPs in ../../datasets/CICIDS2017/raw/
-python preprocess_cicids.py --input <pcap_dir> --output <output_dir>
+# Place CICIDS2017 PCAPs and CSVs
+# PCAPs: ../../datasets/CICIDS2017/raw/
+# CSVs: ../../datasets/CICIDS2017/csv/
+python preprocess_cicids.py \
+    --pcap-dir ../../datasets/CICIDS2017/raw \
+    --csv-dir ../../datasets/CICIDS2017/csv \
+    --output ../../datasets/CICIDS2017/processed
 ```
 
 ### 3. Train (when complete)
