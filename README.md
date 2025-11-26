@@ -45,7 +45,7 @@ flov2t/
 ## Installation
 
 ```bash
-cd /mnt/c/Users/christopherli/OneDrive - TrendMicro/Apey/Masteral/Papers/EdgeFedIDS/benchmark_suite/implementation/flov2t
+cd flov2t
 pip install -r requirements.txt
 ```
 

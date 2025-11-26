@@ -10,7 +10,7 @@
 ## Step 1: Create Virtual Environment
 
 ```bash
-cd "/mnt/c/Users/christopherli/OneDrive - TrendMicro/Apey/Masteral/Papers/EdgeFedIDS/benchmark_suite/implementation/flov2t"
+cd flov2t
 
 # Create virtual environment
 python -m venv venv

@@ -13,7 +13,7 @@ A **60% complete** implementation of FLoV2T with all core components working:
 
 ```
 16 files created in:
-C:\Users\christopherli\OneDrive - TrendMicro\Apey\Masteral\Papers\EdgeFedIDS\benchmark_suite\implementation\flov2t\
+flov2t/
 ```
 
 | Category | Files | Status |
@@ -31,7 +31,7 @@ C:\Users\christopherli\OneDrive - TrendMicro\Apey\Masteral\Papers\EdgeFedIDS\ben
 Test individual components to verify they work:
 
 ```bash
-cd "/mnt/c/Users/christopherli/OneDrive - TrendMicro/Apey/Masteral/Papers/EdgeFedIDS/benchmark_suite/implementation/flov2t"
+cd flov2t
 
 # 1. Test LoRA
 python -m models.lora
